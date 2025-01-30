@@ -24,7 +24,7 @@ public class DiscordBot extends ListenerAdapter {
      * Einstiegspunkt des Programms.
      * Initialisiert den Bot, lädt die Konfiguration und registriert die Befehle.
      *
-     * @param args Kommandozeilenargumente (werden nicht genutzt)
+     * @param args Kommandozeilenargumente  (werden nicht genutzt)
      * @throws InterruptedException Falls die Bot-Initialisierung unterbrochen wird
      * @throws IOException Falls ein Fehler beim Laden der Konfigurationsdatei auftritt
      */
