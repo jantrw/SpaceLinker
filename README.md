@@ -1,6 +1,6 @@
 # DiscordBot
 
-Ein leistungsstarker Discord-Bot mit Unterstützung für NASA-APIs und ISS-Tracking.
+Ein Discord-Bot mit Unterstützung für NASA-APIs, ISS-Tracking, bald auch Mars-Wetterdaten, nahe Erdobjekte und Daten über Exoplaneten.
 
 ## Funktionen
 
