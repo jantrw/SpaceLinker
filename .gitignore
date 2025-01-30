@@ -27,3 +27,10 @@ Thumbs.db
 src/main/resources/config.properties
 src/main/resources/
 src/main/java/todo.txt
+
+#.idea
+.idea/*
+!.idea/misc.xml
+!.idea/modules.xml
+!.idea/vcs.xml
+!.idea/runConfigurations/
