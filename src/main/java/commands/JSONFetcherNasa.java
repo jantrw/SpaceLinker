@@ -20,7 +20,7 @@ public class JSONFetcherNasa {
     private String url;
 
     /**
-     * Konstruktor, der automatisch die APOD-Daten abruft.
+     * Konstruktor, der automatisch die APOD-Daten  abruft.
      *
      * @param apiKey Der API-Schlüssel für die NASA-API.
      */

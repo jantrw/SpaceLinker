@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.jan_dev</groupId>
-    <artifactId>StarLinker</artifactId>
+    <artifactId>SpaceLinker</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
