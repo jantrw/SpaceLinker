@@ -4,7 +4,7 @@ Ein SpaceLinker, der Menschen mit den Sternen verbindet – mit Unterstützung f
 
 ## Funktionen
 
-- **ISS-Tracking**: Ermittelt die aktuelle Position, Geschwindigkeit und Höhe der Internationalen Raumstation (ISS).
+- **ISS-Tracking**: Ermittelt die aktuelle Position (Ozean oder Land mit Staat + Stadt), Geschwindigkeit und Höhe der Internationalen Raumstation (ISS).
 
   <img src="images/ISS_Output.png" alt="ISS-Output" width="500">
 
