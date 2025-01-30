@@ -29,7 +29,7 @@ public class ISSData extends ListenerAdapter {
      * <p>
      * Diese Methode wird automatisch aufgerufen, wenn ein Nutzer den Befehl "/iss" in Discord ausführt.
      * Sie ruft aktuelle ISS-Daten von verschiedenen APIs ab, formatiert die Informationen und sendet
-     * sie als Antwort an den Nutzer.
+     * sie als  Antwort an den Nutzer.
      * </p>
      *
      * @param event Das {@link SlashCommandInteractionEvent}, das die Slash-Command-Interaktion beschreibt.
