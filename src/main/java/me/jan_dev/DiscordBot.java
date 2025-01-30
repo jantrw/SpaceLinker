@@ -34,7 +34,7 @@ public class DiscordBot extends ListenerAdapter {
         Properties prop = new Properties();
 
         // Pfad zur Konfigurationsdatei
-        String path = "/home/jantrw/Development/bot_full-main/java-discord-bot/Discord-Bot/src/main/resources/config.properties";
+        String path = "/home/jantrw/Development/bot_full-main/java-discord-bot/StarLinker/src/main/resources/config.properties";
 
         // Konfigurationsdatei laden
         prop.load(new FileInputStream(path));

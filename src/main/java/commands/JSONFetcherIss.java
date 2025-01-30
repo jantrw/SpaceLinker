@@ -193,7 +193,7 @@ public class JSONFetcherIss {
      */
     public void setUsername() {
         Properties prop = new Properties();
-        String path = "/home/jantrw/Development/bot_full-main/java-discord-bot/Discord-Bot/src/main/resources/config.properties";
+        String path = "/home/jantrw/Development/bot_full-main/java-discord-bot/StarLinker/src/main/resources/config.properties";
         try {
             prop.load(new FileInputStream(path));
         } catch (IOException e) {
