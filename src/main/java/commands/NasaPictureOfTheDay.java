@@ -24,7 +24,7 @@ public class NasaPictureOfTheDay extends ListenerAdapter {
 
     private String loadApiKey() {
         Properties prop = new Properties();
-        String configPath = "/home/jantrw/Development/bot_full-main/java-discord-bot/StarLinker/src/main/resources/config.properties";
+        String configPath = "A:\\Development\\StarLinker\\src\\main\\resources\\config.properties";
         try (FileInputStream input = new FileInputStream(configPath)) {
             prop.load(input);
             return prop.getProperty("apiKeyNasa", "DEMO_KEY");
