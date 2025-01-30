@@ -1,6 +1,6 @@
-# 🌌 StarLinker
+# 🌌 SpaceLinker
 
-Ein Discord-Bot, der Menschen mit den Sternen verbindet – mit Unterstützung für NASA-APIs, ISS-Tracking und bald auch Mars-Wetterdaten, nahe Erdobjekte sowie Daten über Exoplaneten.
+Ein SpaceLinker, der Menschen mit den Sternen verbindet – mit Unterstützung für NASA-APIs, ISS-Tracking und bald auch Mars-Wetterdaten, nahe Erdobjekte sowie Daten über Exoplaneten.
 
 ## Funktionen
 
@@ -32,8 +32,8 @@ Ein Discord-Bot, der Menschen mit den Sternen verbindet – mit Unterstützung f
 
 1. Repository klonen:
    ```sh
-   git clone https://github.com/jantrw/discord-bot.git
-   cd StarLinker
+   git clone https://github.com/jantrw/SpaceLinker.git
+   cd SpaceLinker
    ```
 2. `.env` Datei mit den API-Schlüsseln und dem Discord-Token erstellen:
    ```env
@@ -44,7 +44,7 @@ Ein Discord-Bot, der Menschen mit den Sternen verbindet – mit Unterstützung f
 3. Mit Maven bauen und starten:
    ```sh
    mvn package
-   java -jar target/discord-bot.jar
+   java -jar target/SpaceLinker.jar
    ```
 
 ## Nutzung
