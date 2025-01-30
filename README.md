@@ -1,4 +1,4 @@
-# DiscordBot
+# 🛰 StarLinker
 
 Ein Discord-Bot mit Unterstützung für NASA-APIs, ISS-Tracking, bald auch Mars-Wetterdaten, nahe Erdobjekte und Daten über Exoplaneten.
 
