@@ -32,7 +32,7 @@ Ein Discord-Bot mit Unterstützung für NASA-APIs, ISS-Tracking, bald auch Mars-
 
 1. Repository klonen:
    ```sh
-   git clone https://github.com/jantrw/discord-bot.git
+   git clone https://github.com/jantrw/StarLinker.git
    cd discord-bot
    ```
 2. `.env` Datei mit den API-Schlüsseln und dem Discord-Token erstellen:
@@ -44,7 +44,7 @@ Ein Discord-Bot mit Unterstützung für NASA-APIs, ISS-Tracking, bald auch Mars-
 3. Mit Maven bauen und starten:
    ```sh
    mvn package
-   java -jar target/discord-bot.jar
+   java -jar target/StarLinker.jar
    ```
 
 ## Nutzung
