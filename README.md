@@ -35,8 +35,8 @@ Ein SpaceLinker, der Menschen mit den Sternen verbindet – mit Unterstützung f
    git clone https://github.com/jantrw/SpaceLinker.git
    cd SpaceLinker
    ```
-2. `.env` Datei mit den API-Schlüsseln und dem Discord-Token erstellen:
-   ```env
+2. `config.properties` Datei mit den API-Schlüsseln und dem Discord-Token erstellen:
+   ```config.properties
    DISCORD_TOKEN=your_token_here
    NASA_API_KEY=your_nasa_api_key_here
    USERNAME=your_username
