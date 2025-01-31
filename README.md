@@ -1,6 +1,6 @@
 # 🌌 SpaceLinker
 
-Ein SpaceLinker, der Menschen mit den Sternen verbindet – mit Unterstützung für NASA-APIs, ISS-Tracking und bald auch Mars-Wetterdaten, nahe Erdobjekte sowie Daten über Exoplaneten.
+Ein SpaceLinker, der Menschen mit dem Weltraum verbindet – mit Unterstützung für NASA-APIs, ISS-Tracking und bald auch Mars-Wetterdaten, nahe Erdobjekte sowie Daten über Exoplaneten.
 
 ## Funktionen
 
