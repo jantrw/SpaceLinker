@@ -74,6 +74,13 @@ Core classes of the bot:
 - `JSONFetcherIss.java` – Fetches current ISS data from an API.
 - `JSONFetcherNasa.java` – Fetches the NASA Picture of the Day.
 
+## Contributing
+Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+## Support
+If you encounter any issues, create a GitHub issue.
+
+
 ## License
 
 MIT License
