@@ -32,17 +32,17 @@ A SpaceLinker that connects people with space – with support for NASA APIs and
 ### Setup
 
 1. Clone the repository:
-   git clone https://github.com/jantrw/SpaceLinker.git
-   cd SpaceLinker
+   'git clone https://github.com/jantrw/SpaceLinker.git'
+   'cd SpaceLinker'
 
 2. Create a `config.properties` file with the API keys and Discord token:
-   DISCORD_TOKEN=your_token_here
-   NASA_API_KEY=your_nasa_api_key_here
-   USERNAME=your_username
+   'DISCORD_TOKEN=your_token_here'
+   'NASA_API_KEY=your_nasa_api_key_here'
+   'USERNAME=your_username'
 
 3. Build and run with Maven:
-   mvn package
-   java -jar target/SpaceLinker.jar
+   'mvn package'
+   'java -jar target/SpaceLinker.jar'
 
 ## Usage
 
