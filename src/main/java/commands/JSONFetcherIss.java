@@ -2,8 +2,8 @@ package commands;
 
 import org.json.JSONObject;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -193,9 +193,11 @@ public class JSONFetcherIss {
      */
     public void setUsername() {
         Properties prop = new Properties();
-        String path = "A:\\Development\\StarLinker\\src\\main\\resources\\config.properties";
-        try {
-            prop.load(new FileInputStream(path));
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                throw new RuntimeException("config.properties nicht im Classpath gefunden!");
+            }
+            prop.load(input);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

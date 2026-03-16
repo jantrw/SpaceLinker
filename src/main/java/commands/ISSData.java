@@ -38,46 +38,39 @@ public class ISSData extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("iss")) return;
 
-        System.out.println("Befehl /iss wurde ausgeführt!");
+        // Deferred Reply, da die API-Aufrufe Zeit benötigen
+        event.deferReply().queue(hook -> {
+            try {
+                jsonFetcher.fetchAllData();
 
-        // ❌ event.deferReply() wurde entfernt, um doppelte Antworten zu vermeiden
-        // Falls eine verzögerte Antwort gewünscht ist, sollte ein Hook verwendet werden
+                // Daten von der API abrufen
+                String latitude = jsonFetcher.getLatitude();
+                String longitude = jsonFetcher.getLongitude();
+                double velocity = jsonFetcher.getVelocity();
+                double altitude = jsonFetcher.getAltitude();
+                String country = jsonFetcher.getCountry();
+                String timezone = jsonFetcher.getTimezone_id();
+                String mapUrl = jsonFetcher.getMapUrl();
+                String ocean = jsonFetcher.getOcean();
+                String city = jsonFetcher.getCity();
+                String state = jsonFetcher.getState();
 
-        try {
-            System.out.println("Starte fetchAllData()...");
-            jsonFetcher.fetchAllData();
-            System.out.println("fetchAllData() abgeschlossen!");
+                // Prüfen, ob die ISS über einem Land oder einem Ozean ist
+                String locationText = (country.equals("??")) ? ocean : country;
 
-            // Daten von der API abrufen
-            String latitude = jsonFetcher.getLatitude();
-            String longitude = jsonFetcher.getLongitude();
-            double velocity = jsonFetcher.getVelocity();
-            double altitude = jsonFetcher.getAltitude();
-            String country = jsonFetcher.getCountry();
-            String timezone = jsonFetcher.getTimezone_id();
-            String mapUrl = jsonFetcher.getMapUrl();
-            String ocean = jsonFetcher.getOcean();
-            String city = jsonFetcher.getCity();
-            String state = jsonFetcher.getState();
+                // Formatierte Stadt- und Bundesstaat-Daten generieren
+                String cityStateText = getCityStateText(state, city);
 
-            // Prüfen, ob die ISS über einem Land oder einem Ozean ist
-            String locationText = (country.equals("??")) ? ocean : country;
+                // Antwort zusammenbauen
+                String response = buildResponse(latitude, longitude, velocity, altitude, locationText, cityStateText, timezone, mapUrl);
 
-            // Formatierte Stadt- und Bundesstaat-Daten generieren
-            String cityStateText = getCityStateText(state, city);
+                hook.sendMessage(response).queue();
 
-            // Antwort zusammenbauen
-            String response = buildResponse(latitude, longitude, velocity, altitude, locationText, cityStateText, timezone, mapUrl);
-
-            // Antwort senden (event.getHook() wird nur aufgerufen, wenn event.deferReply() genutzt wurde)
-            event.getHook().sendMessage(response).queue();
-            System.out.println("Antwort gesendet!");
-
-        } catch (Exception e) {
-            // Falls ein Fehler auftritt, eine Fehlermeldung senden
-            event.getHook().sendMessage("❌ Fehler beim Abrufen der ISS-Daten.").queue();
-            e.printStackTrace();
-        }
+            } catch (Exception e) {
+                hook.sendMessage("Fehler beim Abrufen der ISS-Daten.").queue();
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

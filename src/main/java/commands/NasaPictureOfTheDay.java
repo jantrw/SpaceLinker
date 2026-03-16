@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -24,8 +24,11 @@ public class NasaPictureOfTheDay extends ListenerAdapter {
 
     private String loadApiKey() {
         Properties prop = new Properties();
-        String configPath = "A:\\Development\\StarLinker\\src\\main\\resources\\config.properties";
-        try (FileInputStream input = new FileInputStream(configPath)) {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                System.err.println("config.properties nicht im Classpath gefunden!");
+                return "DEMO_KEY";
+            }
             prop.load(input);
             return prop.getProperty("apiKeyNasa", "DEMO_KEY");
         } catch (IOException e) {

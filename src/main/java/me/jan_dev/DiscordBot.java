@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -33,11 +33,13 @@ public class DiscordBot extends ListenerAdapter {
         // Eigenschaften-Objekt für die Konfigurationsdatei
         Properties prop = new Properties();
 
-        // Pfad zur Konfigurationsdatei
-        String path = "A:\\Development\\StarLinker\\src\\main\\resources\\config.properties";
-
-        // Konfigurationsdatei laden
-        prop.load(new FileInputStream(path));
+        // Konfigurationsdatei aus dem Classpath laden
+        try (InputStream input = DiscordBot.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                throw new IOException("config.properties nicht im Classpath gefunden!");
+            }
+            prop.load(input);
+        }
 
         // Bot-Token aus der Konfigurationsdatei abrufen
         String token = prop.getProperty("botToken");
