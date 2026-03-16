@@ -1,8 +1,10 @@
 package me.jan_dev;
 
 import commands.NasaPictureOfTheDay;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Diese Klasse verarbeitet empfangene Nachrichten und führt die entsprechenden Befehle aus.
@@ -108,11 +110,39 @@ public class BotListener extends ListenerAdapter {
      */
     private void sendHelpMessage(MessageReceivedEvent event, String prefix) {
         event.getChannel().sendMessage(
-                "**Verfügbare Befehle:**\n" +
+                "**Verfügbare Befehle:**\n\n" +
+                        "**Slash-Commands (/):**\n" +
+                        "`/picture` - Zeigt das NASA-Bild des Tages\n" +
+                        "`/pictureinfo` - Zeigt Infos zum NASA-Bild\n" +
+                        "`/iss` - Zeigt die aktuelle ISS-Position\n" +
+                        "`/help` - Zeigt diese Hilfe-Nachricht\n\n" +
+                        "**Text-Befehle (" + prefix + "):**\n" +
                         "`" + prefix + "nasapic` - Zeigt das NASA-Bild des Tages\n" +
                         "`" + prefix + "nasapicinfo` - Zeigt Infos zum NASA-Bild\n" +
                         "`" + prefix + "setprefix [neues Präfix]` - Ändert das Präfix\n" +
                         "`" + prefix + "help` - Zeigt diese Hilfe-Nachricht an"
         ).queue();
+    }
+
+    /**
+     * Verarbeitet den Slash-Befehl "/help".
+     */
+    @Override
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        if (!event.getName().equals("help")) return;
+
+        event.reply(
+                "**Verfügbare Befehle:**\n\n" +
+                        "**Slash-Commands (/):**\n" +
+                        "`/picture` - Zeigt das NASA-Bild des Tages\n" +
+                        "`/pictureinfo` - Zeigt Infos zum NASA-Bild\n" +
+                        "`/iss` - Zeigt die aktuelle ISS-Position\n" +
+                        "`/help` - Zeigt diese Hilfe-Nachricht\n\n" +
+                        "**Text-Befehle (!):**\n" +
+                        "`!nasapic` - Zeigt das NASA-Bild des Tages\n" +
+                        "`!nasapicinfo` - Zeigt Infos zum NASA-Bild\n" +
+                        "`!setprefix [neues Präfix]` - Ändert das Präfix\n" +
+                        "`!help` - Zeigt diese Hilfe-Nachricht an"
+        ).setEphemeral(true).queue();
     }
 }
