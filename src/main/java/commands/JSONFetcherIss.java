@@ -1,14 +1,12 @@
 package commands;
 
+import data.Config;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Properties;
 
 /**
  * Die Klasse {@code JSONFetcherIss} ruft aktuelle Daten zur Internationalen Raumstation (ISS) von verschiedenen APIs ab.
@@ -19,240 +17,175 @@ import java.util.Properties;
  */
 public class JSONFetcherIss {
 
+    private static final String NORAD_ID = "25544"; // ISS NORAD-Katalog-ID
+    private static final String DEFAULT_VALUE = "??";
+
+    // Shared HttpClient für alle Anfragen
+    private static final HttpClient httpClient = HttpClient.newHttpClient();
+
     // ISS-Datenvariablen
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
     private double velocity, altitude;
-    private String username; // API-Nutzername für die GeoNames-API
+    private final String username;
 
-    /**
-     * Konstruktor für {@code JSONFetcherIss}.
-     * <p>
-     * Lädt den API-Nutzernamen aus der Konfigurationsdatei, ruft aber noch keine Daten ab.
-     * Die Daten müssen explizit durch einen Aufruf von {@link #fetchAllData()} geladen werden.
-     * </p>
-     */
     public JSONFetcherIss() {
-        setUsername();
+        this.username = Config.get("username", "");
     }
 
     /**
      * Ruft alle relevanten ISS-Daten von externen APIs ab.
-     * <p>
-     * Diese Methode führt alle API-Abfragen nacheinander aus, um die aktuellen ISS-Daten abzurufen.
-     * </p>
+     * Die einzelnen Fetch-Schritte prüfen auf erfolgreiche Vorergebnisse.
+     *
+     * @return true, wenn alle Daten erfolgreich abgerufen wurden.
      */
-    public void fetchAllData() {
+    public boolean fetchAllData() {
         fetchLocation();
+
+        if (latitude == null || longitude == null) {
+            System.err.println("ISS-Position konnte nicht abgerufen werden.");
+            return false;
+        }
+
         fetchSpeedHeight();
         fetchMapUrlTimeZone();
         fetchCountry();
         fetchOcean();
+        return true;
     }
 
-    /**
-     * Holt die aktuelle geografische Position (Breiten- und Längengrad) der ISS.
-     * Die Daten werden von der API "Open Notify" abgerufen.
-     */
     public void fetchLocation() {
         try {
-            HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("http://api.open-notify.org/iss-now.json"))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject json = new JSONObject(response.body());
 
-            // Koordinaten extrahieren
             JSONObject data = json.getJSONObject("iss_position");
             this.latitude = data.getString("latitude");
             this.longitude = data.getString("longitude");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Abrufen der ISS-Position: " + e.getMessage());
+            this.latitude = null;
+            this.longitude = null;
         }
     }
 
-    /**
-     * Holt die aktuelle Geschwindigkeit (in km/h) und Höhe (in km) der ISS.
-     * Die Daten werden von der API "Where the ISS at" abgerufen.
-     */
     public void fetchSpeedHeight() {
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            String noradCatalogID = "25544"; // NORAD-Katalog-ID der ISS
-
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("https://api.wheretheiss.at/v1/satellites/" + noradCatalogID))
+                    .uri(new URI("https://api.wheretheiss.at/v1/satellites/" + NORAD_ID))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject json = new JSONObject(response.body());
 
-            // Geschwindigkeit und Höhe extrahieren
             this.velocity = json.getDouble("velocity");
             this.altitude = json.getDouble("altitude");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Abrufen der ISS-Geschwindigkeit/Höhe: " + e.getMessage());
+            this.velocity = 0;
+            this.altitude = 0;
         }
     }
 
-    /**
-     * Holt die aktuelle Zeitzone und eine Google-Maps-URL basierend auf der ISS-Position.
-     */
     public void fetchMapUrlTimeZone() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        if (latitude == null || longitude == null) return;
 
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://api.wheretheiss.at/v1/coordinates/" + this.latitude + "," + this.longitude))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject json = new JSONObject(response.body());
 
-            // Zeitzone und Karten-URL extrahieren
-            this.timezone_id = json.getString("timezone_id");
-            this.mapUrl = json.getString("map_url");
+            this.timezone_id = json.optString("timezone_id", DEFAULT_VALUE);
+            this.mapUrl = json.optString("map_url", "");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Abrufen der Zeitzone/Karte: " + e.getMessage());
+            this.timezone_id = DEFAULT_VALUE;
+            this.mapUrl = "";
         }
     }
 
-    /**
-     * Holt die Ozeanbezeichnung, falls sich die ISS über einem Gewässer befindet.
-     * Die Daten werden von der GeoNames-API abgerufen.
-     */
     public void fetchOcean() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        if (latitude == null || longitude == null) return;
+        if (username == null || username.isBlank()) {
+            this.ocean = "GeoNames-Benutzername nicht konfiguriert";
+            return;
+        }
 
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("http://api.geonames.org/extendedFindNearbyJSON?lat=" + this.latitude + "&lng=" + this.longitude + "&username=" + this.username))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject json = new JSONObject(response.body());
 
             if (json.has("ocean")) {
                 JSONObject oceanObj = json.getJSONObject("ocean");
-                this.ocean = oceanObj.getString("name");
+                this.ocean = oceanObj.optString("name", DEFAULT_VALUE);
             } else {
                 this.ocean = "Die ISS ist über einem Land";
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Abrufen der Ozean-Daten: " + e.getMessage());
+            this.ocean = DEFAULT_VALUE;
         }
     }
 
-    /**
-     * Holt das Land, den Bundesstaat und die Stadt basierend auf den aktuellen ISS-Koordinaten.
-     * Falls die API keine Daten liefert, werden Standardwerte ("??") gesetzt.
-     */
     public void fetchCountry() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        if (latitude == null || longitude == null) return;
 
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://nominatim.openstreetmap.org/reverse?lat=" + this.latitude + "&lon=" + this.longitude + "&format=json"))
                     .GET()
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             JSONObject json = new JSONObject(response.body());
 
-            // Prüfen, ob ein Adress-Objekt vorhanden ist
             if (json.has("address")) {
                 JSONObject address = json.getJSONObject("address");
-
-                // Land, Bundesstaat und Stadt extrahieren (mit Fallbacks)
-                this.country = address.optString("country", "??");
-                this.state = address.optString("state", "??");
-                this.city = address.optString("city", address.optString("town", address.optString("village", "??")));
+                this.country = address.optString("country", DEFAULT_VALUE);
+                this.state = address.optString("state", DEFAULT_VALUE);
+                this.city = address.optString("city", address.optString("town", address.optString("village", DEFAULT_VALUE)));
             } else {
-                this.country = "??";
-                this.state = "??";
-                this.city = "??";
+                this.country = DEFAULT_VALUE;
+                this.state = DEFAULT_VALUE;
+                this.city = DEFAULT_VALUE;
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Fehler beim Abrufen der Land-Daten: " + e.getMessage());
+            this.country = DEFAULT_VALUE;
+            this.state = DEFAULT_VALUE;
+            this.city = DEFAULT_VALUE;
         }
     }
 
-    /**
-     * Lädt den API-Nutzernamen für GeoNames aus einer Konfigurationsdatei.
-     * Dieser Nutzername ist erforderlich, um die API nutzen zu können.
-     */
-    public void setUsername() {
-        Properties prop = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                throw new RuntimeException("config.properties nicht im Classpath gefunden!");
-            }
-            prop.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        this.username = prop.getProperty("username");
-    }
+    // Getter-Methoden
 
-    // Getter-Methoden für die abgerufenen ISS-Daten
-
-    /** @return Die aktuelle Länge der ISS. */
-    public String getLongitude() {
-        return longitude;
-    }
-
-    /** @return Die aktuelle Breite der ISS. */
-    public String getLatitude() {
-        return latitude;
-    }
-
-    /** @return Die Zeitzone der aktuellen ISS-Position. */
-    public String getTimezone_id() {
-        return timezone_id;
-    }
-
-    /** @return Das aktuelle Land unter der ISS oder "??" falls unbekannt. */
-    public String getCountry() {
-        return country;
-    }
-
-    /** @return Die URL zur Karte mit der ISS-Position. */
-    public String getMapUrl() {
-        return mapUrl;
-    }
-
-    /** @return Die Geschwindigkeit der ISS in km/h. */
-    public double getVelocity() {
-        return velocity;
-    }
-
-    /** @return Die Höhe der ISS in km. */
-    public double getAltitude() {
-        return altitude;
-    }
-
-    /** @return Der Ozean unter der ISS oder eine Meldung, falls sie über Land ist. */
-    public String getOcean() {
-        return ocean;
-    }
-
-    /** @return Der Bundesstaat unter der ISS oder "??" falls unbekannt. */
-    public String getState() {
-        return state;
-    }
-
-    /** @return Die Stadt unter der ISS oder "??" falls unbekannt. */
-    public String getCity() {
-        return city;
-    }
+    public String getLongitude() { return longitude; }
+    public String getLatitude() { return latitude; }
+    public String getTimezone_id() { return timezone_id; }
+    public String getCountry() { return country; }
+    public String getMapUrl() { return mapUrl; }
+    public double getVelocity() { return velocity; }
+    public double getAltitude() { return altitude; }
+    public String getOcean() { return ocean; }
+    public String getState() { return state; }
+    public String getCity() { return city; }
 }

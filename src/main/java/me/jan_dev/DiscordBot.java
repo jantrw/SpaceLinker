@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
+import data.Config;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Hauptklasse für den Discord-Bot.
@@ -28,21 +28,14 @@ public class DiscordBot extends ListenerAdapter {
      * @throws InterruptedException Falls die Bot-Initialisierung unterbrochen wird
      * @throws IOException Falls ein Fehler beim Laden der Konfigurationsdatei auftritt
      */
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException {
 
-        // Eigenschaften-Objekt für die Konfigurationsdatei
-        Properties prop = new Properties();
+        // Bot-Token aus der Konfiguration abrufen
+        String token = Config.get("botToken");
 
-        // Konfigurationsdatei aus dem Classpath laden
-        try (InputStream input = DiscordBot.class.getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                throw new IOException("config.properties nicht im Classpath gefunden!");
-            }
-            prop.load(input);
+        if (token == null || token.isBlank()) {
+            throw new RuntimeException("Bot-Token nicht in config.properties gefunden!");
         }
-
-        // Bot-Token aus der Konfigurationsdatei abrufen
-        String token = prop.getProperty("botToken");
 
         // Erstellen und Starten der JDA-Instanz mit den benötigten Berechtigungen
         JDA bot = JDABuilder.createDefault(token,

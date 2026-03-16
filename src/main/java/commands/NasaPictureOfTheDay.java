@@ -1,14 +1,11 @@
 package commands;
 
+import data.Config;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Diese Klasse verarbeitet Slash-Befehle für das NASA-Bild des Tages.
@@ -16,25 +13,14 @@ import java.util.Properties;
  */
 public class NasaPictureOfTheDay extends ListenerAdapter {
 
-    private final JSONFetcherNasa jsonFetcherNasa;
+    // Discord Embed-Limits
+    private static final int MAX_EMBED_TITLE = 256;
+    private static final int MAX_EMBED_DESCRIPTION = 4096;
+
+    private final String apiKey;
 
     public NasaPictureOfTheDay() {
-        this.jsonFetcherNasa = new JSONFetcherNasa(loadApiKey());
-    }
-
-    private String loadApiKey() {
-        Properties prop = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                System.err.println("config.properties nicht im Classpath gefunden!");
-                return "DEMO_KEY";
-            }
-            prop.load(input);
-            return prop.getProperty("apiKeyNasa", "DEMO_KEY");
-        } catch (IOException e) {
-            System.err.println("Fehler beim Laden der NASA-API-Konfiguration: " + e.getMessage());
-            return "DEMO_KEY";
-        }
+        this.apiKey = Config.get("apiKeyNasa", "DEMO_KEY");
     }
 
     @Override
@@ -51,41 +37,60 @@ public class NasaPictureOfTheDay extends ListenerAdapter {
         }
     }
 
-    // 🌟 Methode für Slash-Befehl (Bleibt unverändert, aber jetzt öffentlich)
+    // Slash-Command: Bild mit Infos
     public void handleCommand(SlashCommandInteractionEvent event) {
+        // Daten erst jetzt abrufen (lazy)
+        JSONFetcherNasa fetcher = new JSONFetcherNasa(apiKey);
+
         EmbedBuilder embed = new EmbedBuilder()
-                .setTitle(jsonFetcherNasa.getTitle())
-                .setDescription(jsonFetcherNasa.getExplanation())
-                .setImage(jsonFetcherNasa.getUrl());
+                .setTitle(truncate(fetcher.getTitle(), MAX_EMBED_TITLE))
+                .setDescription(truncate(fetcher.getExplanation(), MAX_EMBED_DESCRIPTION))
+                .setImage(fetcher.getUrl());
 
         event.getHook().sendMessageEmbeds(embed.build()).queue();
     }
 
-    // 🌟 Methode für Slash-Befehl (Bleibt unverändert, aber jetzt öffentlich)
+    // Slash-Command: nur Bild
     public void handleCommandPicture(SlashCommandInteractionEvent event) {
+        JSONFetcherNasa fetcher = new JSONFetcherNasa(apiKey);
+
         EmbedBuilder embed = new EmbedBuilder()
-                .setTitle(jsonFetcherNasa.getTitle())
-                .setImage(jsonFetcherNasa.getUrl());
+                .setTitle(truncate(fetcher.getTitle(), MAX_EMBED_TITLE))
+                .setImage(fetcher.getUrl());
 
         event.getHook().sendMessageEmbeds(embed.build()).queue();
     }
 
-    // ✨ NEUE Methode für normale Textnachrichten
+    // Text-Befehl: Bild mit Infos
     public void handleCommand(MessageReceivedEvent event) {
+        JSONFetcherNasa fetcher = new JSONFetcherNasa(apiKey);
+
         EmbedBuilder embed = new EmbedBuilder()
-                .setTitle(jsonFetcherNasa.getTitle())
-                .setDescription(jsonFetcherNasa.getExplanation())
-                .setImage(jsonFetcherNasa.getUrl());
+                .setTitle(truncate(fetcher.getTitle(), MAX_EMBED_TITLE))
+                .setDescription(truncate(fetcher.getExplanation(), MAX_EMBED_DESCRIPTION))
+                .setImage(fetcher.getUrl());
 
         event.getChannel().sendMessageEmbeds(embed.build()).queue();
     }
 
-    // ✨ NEUE Methode für normale Textnachrichten
+    // Text-Befehl: nur Bild
     public void handleCommandPicture(MessageReceivedEvent event) {
+        JSONFetcherNasa fetcher = new JSONFetcherNasa(apiKey);
+
         EmbedBuilder embed = new EmbedBuilder()
-                .setTitle(jsonFetcherNasa.getTitle())
-                .setImage(jsonFetcherNasa.getUrl());
+                .setTitle(truncate(fetcher.getTitle(), MAX_EMBED_TITLE))
+                .setImage(fetcher.getUrl());
 
         event.getChannel().sendMessageEmbeds(embed.build()).queue();
+    }
+
+    /**
+     * Kürzt einen Text auf die angegebene maximale Länge.
+     * Fügt "..." hinzu, wenn der Text abgeschnitten wird.
+     */
+    private String truncate(String text, int maxLength) {
+        if (text == null) return "";
+        if (text.length() <= maxLength) return text;
+        return text.substring(0, maxLength - 3) + "...";
     }
 }
