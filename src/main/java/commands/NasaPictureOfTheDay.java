@@ -25,9 +25,12 @@ public class NasaPictureOfTheDay extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        String name = event.getName();
+        if (!name.equals("picture") && !name.equals("pictureinfo")) return;
+
         event.deferReply().queue();
 
-        switch (event.getName()) {
+        switch (name) {
             case "picture":
                 handleCommandPicture(event);
                 break;

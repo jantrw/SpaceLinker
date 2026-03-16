@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 /**
  * Die Klasse {@code JSONFetcherIss} ruft aktuelle Daten zur Internationalen Raumstation (ISS) von verschiedenen APIs ab.
@@ -19,9 +20,12 @@ public class JSONFetcherIss {
 
     private static final String NORAD_ID = "25544"; // ISS NORAD-Katalog-ID
     private static final String DEFAULT_VALUE = "??";
+    private static final Duration TIMEOUT = Duration.ofSeconds(8);
 
     // Shared HttpClient für alle Anfragen
-    private static final HttpClient httpClient = HttpClient.newHttpClient();
+    private static final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(16))
+            .build();
 
     // ISS-Datenvariablen
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
@@ -57,6 +61,7 @@ public class JSONFetcherIss {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("http://api.open-notify.org/iss-now.json"))
+                    .timeout(TIMEOUT)
                     .GET()
                     .build();
 
@@ -78,6 +83,7 @@ public class JSONFetcherIss {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://api.wheretheiss.at/v1/satellites/" + NORAD_ID))
+                    .timeout(TIMEOUT)
                     .GET()
                     .build();
 
@@ -100,6 +106,7 @@ public class JSONFetcherIss {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://api.wheretheiss.at/v1/coordinates/" + this.latitude + "," + this.longitude))
+                    .timeout(TIMEOUT)
                     .GET()
                     .build();
 
@@ -126,6 +133,7 @@ public class JSONFetcherIss {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("http://api.geonames.org/extendedFindNearbyJSON?lat=" + this.latitude + "&lng=" + this.longitude + "&username=" + this.username))
+                    .timeout(TIMEOUT)
                     .GET()
                     .build();
 
@@ -151,6 +159,8 @@ public class JSONFetcherIss {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://nominatim.openstreetmap.org/reverse?lat=" + this.latitude + "&lon=" + this.longitude + "&format=json"))
+                    .header("User-Agent", "SpaceLinker-Discord-Bot/1.0")
+                    .timeout(TIMEOUT)
                     .GET()
                     .build();
 
