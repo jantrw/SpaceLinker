@@ -3,11 +3,11 @@ package commands;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import data.Config;
+import data.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -22,11 +22,6 @@ public class JSONFetcherIss {
     private static final String NORAD_ID = "25544";
     private static final String DEFAULT_VALUE = "??";
     private static final Duration TIMEOUT = Duration.ofSeconds(8);
-
-    private static final HttpClient httpClient = HttpClient.newBuilder()
-            // Iss braucht lange zum Antworten, falls es keine Antwort schickt ggf. länger warten
-            .connectTimeout(Duration.ofSeconds(15))
-            .build();
 
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
     private double velocity, altitude;
@@ -59,7 +54,7 @@ public class JSONFetcherIss {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
             JsonObject data = json.getAsJsonObject("iss_position");
 
@@ -83,7 +78,7 @@ public class JSONFetcherIss {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             this.velocity = json.get("velocity").getAsDouble();
@@ -106,7 +101,7 @@ public class JSONFetcherIss {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             this.timezone_id = optString(json, "timezone_id", DEFAULT_VALUE);
@@ -133,7 +128,7 @@ public class JSONFetcherIss {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (json.has("ocean")) {
@@ -159,7 +154,7 @@ public class JSONFetcherIss {
                     .GET()
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (json.has("address")) {

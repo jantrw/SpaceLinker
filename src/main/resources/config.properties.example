@@ -1,0 +1,6 @@
+# API Key for NASA https://api.nasa.gov/
+apiKeyNasa=YOUR_NASA_API_KEY_HERE
+# Token for Discord Bot
+botToken=YOUR_DISCORD_BOT_TOKEN_HERE
+# API Username for GeoNames https://www.geonames.org/
+username=YOUR_GEONAMES_USERNAME_HERE

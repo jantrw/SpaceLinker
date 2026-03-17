@@ -2,19 +2,18 @@ package commands;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import data.Http;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
 /**
  * Zentrale Verarbeitung für NASA Picture of the Day.
- * Wird von sowohl Slash-Commands als auch Text-Befehlen verwendet.
  */
 public class NasaCommandHandler {
 
@@ -23,10 +22,6 @@ public class NasaCommandHandler {
     private static final int MAX_EMBED_TITLE = 256;
     private static final int MAX_EMBED_DESCRIPTION = 4096;
     private static final Duration TIMEOUT = Duration.ofSeconds(8);
-
-    private static final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
 
     private final String apiKey;
 
@@ -75,7 +70,7 @@ public class NasaCommandHandler {
                     .timeout(TIMEOUT)
                     .build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = Http.client().send(request, HttpResponse.BodyHandlers.ofString());
             return JsonParser.parseString(response.body()).getAsJsonObject();
 
         } catch (Exception e) {

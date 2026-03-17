@@ -29,8 +29,7 @@ public class DiscordBot {
         }
 
         JDA bot = JDABuilder.createDefault(token,
-                        GatewayIntent.GUILD_MESSAGES,
-                        GatewayIntent.MESSAGE_CONTENT)
+                        GatewayIntent.GUILD_MESSAGES)
                 .setActivity(Activity.playing("mit der ISS"))
                 .addEventListeners(new BotListener())
                 .addEventListeners(new NasaPictureOfTheDay())
