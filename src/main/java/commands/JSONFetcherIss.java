@@ -24,7 +24,8 @@ public class JSONFetcherIss {
     private static final Duration TIMEOUT = Duration.ofSeconds(8);
 
     private static final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
+            // Iss braucht lange zum Antworten, falls es keine Antwort schickt ggf. länger warten
+            .connectTimeout(Duration.ofSeconds(15))
             .build();
 
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
