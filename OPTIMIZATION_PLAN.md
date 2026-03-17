@@ -56,7 +56,7 @@
 
 ### Phase 3c: Performance Optimization
 
-- [ ] 14. Conditional slash command registration — register once, only update when commands change
+- [x] 14. Conditional slash command registration — register once, only update when commands change
 
 ### Phase 4: Persistence
 
