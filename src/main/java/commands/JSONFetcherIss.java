@@ -1,7 +1,10 @@
 package commands;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import data.Config;
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -10,24 +13,20 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 
 /**
- * Die Klasse {@code JSONFetcherIss} ruft aktuelle Daten zur Internationalen Raumstation (ISS) von verschiedenen APIs ab.
- * Sie liefert Informationen zur Position, Geschwindigkeit, Höhe, dem aktuellen Land oder Ozean sowie der zugehörigen Zeitzone.
- * <p>
- * Die Daten müssen über die Methode {@link #fetchAllData()} abgerufen werden, bevor sie durch Getter-Methoden verfügbar sind.
- * </p>
+ * Ruft aktuelle Daten zur ISS von verschiedenen APIs ab.
  */
 public class JSONFetcherIss {
 
-    private static final String NORAD_ID = "25544"; // ISS NORAD-Katalog-ID
+    private static final Logger log = LoggerFactory.getLogger(JSONFetcherIss.class);
+
+    private static final String NORAD_ID = "25544";
     private static final String DEFAULT_VALUE = "??";
     private static final Duration TIMEOUT = Duration.ofSeconds(8);
 
-    // Shared HttpClient für alle Anfragen
     private static final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(16))
+            .connectTimeout(Duration.ofSeconds(5))
             .build();
 
-    // ISS-Datenvariablen
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
     private double velocity, altitude;
     private final String username;
@@ -36,17 +35,11 @@ public class JSONFetcherIss {
         this.username = Config.get("username", "");
     }
 
-    /**
-     * Ruft alle relevanten ISS-Daten von externen APIs ab.
-     * Die einzelnen Fetch-Schritte prüfen auf erfolgreiche Vorergebnisse.
-     *
-     * @return true, wenn alle Daten erfolgreich abgerufen wurden.
-     */
     public boolean fetchAllData() {
         fetchLocation();
 
         if (latitude == null || longitude == null) {
-            System.err.println("ISS-Position konnte nicht abgerufen werden.");
+            log.error("ISS-Position konnte nicht abgerufen werden.");
             return false;
         }
 
@@ -66,20 +59,22 @@ public class JSONFetcherIss {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONObject json = new JSONObject(response.body());
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+            JsonObject data = json.getAsJsonObject("iss_position");
 
-            JSONObject data = json.getJSONObject("iss_position");
-            this.latitude = data.getString("latitude");
-            this.longitude = data.getString("longitude");
+            this.latitude = data.get("latitude").getAsString();
+            this.longitude = data.get("longitude").getAsString();
 
         } catch (Exception e) {
-            System.err.println("Fehler beim Abrufen der ISS-Position: " + e.getMessage());
+            log.error("Fehler beim Abrufen der ISS-Position", e);
             this.latitude = null;
             this.longitude = null;
         }
     }
 
     public void fetchSpeedHeight() {
+        if (latitude == null || longitude == null) return;
+
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI("https://api.wheretheiss.at/v1/satellites/" + NORAD_ID))
@@ -88,13 +83,13 @@ public class JSONFetcherIss {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONObject json = new JSONObject(response.body());
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
-            this.velocity = json.getDouble("velocity");
-            this.altitude = json.getDouble("altitude");
+            this.velocity = json.get("velocity").getAsDouble();
+            this.altitude = json.get("altitude").getAsDouble();
 
         } catch (Exception e) {
-            System.err.println("Fehler beim Abrufen der ISS-Geschwindigkeit/Höhe: " + e.getMessage());
+            log.error("Fehler beim Abrufen der ISS-Geschwindigkeit/Höhe", e);
             this.velocity = 0;
             this.altitude = 0;
         }
@@ -111,13 +106,13 @@ public class JSONFetcherIss {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONObject json = new JSONObject(response.body());
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
-            this.timezone_id = json.optString("timezone_id", DEFAULT_VALUE);
-            this.mapUrl = json.optString("map_url", "");
+            this.timezone_id = optString(json, "timezone_id", DEFAULT_VALUE);
+            this.mapUrl = optString(json, "map_url", "");
 
         } catch (Exception e) {
-            System.err.println("Fehler beim Abrufen der Zeitzone/Karte: " + e.getMessage());
+            log.error("Fehler beim Abrufen der Zeitzone/Karte", e);
             this.timezone_id = DEFAULT_VALUE;
             this.mapUrl = "";
         }
@@ -138,17 +133,16 @@ public class JSONFetcherIss {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONObject json = new JSONObject(response.body());
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (json.has("ocean")) {
-                JSONObject oceanObj = json.getJSONObject("ocean");
-                this.ocean = oceanObj.optString("name", DEFAULT_VALUE);
+                this.ocean = optString(json.getAsJsonObject("ocean"), "name", DEFAULT_VALUE);
             } else {
                 this.ocean = "Die ISS ist über einem Land";
             }
 
         } catch (Exception e) {
-            System.err.println("Fehler beim Abrufen der Ozean-Daten: " + e.getMessage());
+            log.error("Fehler beim Abrufen der Ozean-Daten", e);
             this.ocean = DEFAULT_VALUE;
         }
     }
@@ -165,13 +159,15 @@ public class JSONFetcherIss {
                     .build();
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            JSONObject json = new JSONObject(response.body());
+            JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
 
             if (json.has("address")) {
-                JSONObject address = json.getJSONObject("address");
-                this.country = address.optString("country", DEFAULT_VALUE);
-                this.state = address.optString("state", DEFAULT_VALUE);
-                this.city = address.optString("city", address.optString("town", address.optString("village", DEFAULT_VALUE)));
+                JsonObject address = json.getAsJsonObject("address");
+                this.country = optString(address, "country", DEFAULT_VALUE);
+                this.state = optString(address, "state", DEFAULT_VALUE);
+                this.city = optString(address, "city",
+                        optString(address, "town",
+                                optString(address, "village", DEFAULT_VALUE)));
             } else {
                 this.country = DEFAULT_VALUE;
                 this.state = DEFAULT_VALUE;
@@ -179,14 +175,21 @@ public class JSONFetcherIss {
             }
 
         } catch (Exception e) {
-            System.err.println("Fehler beim Abrufen der Land-Daten: " + e.getMessage());
+            log.error("Fehler beim Abrufen der Land-Daten", e);
             this.country = DEFAULT_VALUE;
             this.state = DEFAULT_VALUE;
             this.city = DEFAULT_VALUE;
         }
     }
 
-    // Getter-Methoden
+    /**
+     * Sichere String-Extraktion aus einem JsonObject (Gson hat kein optString).
+     */
+    private String optString(JsonObject obj, String key, String defaultValue) {
+        return (obj.has(key) && !obj.get(key).isJsonNull()) ? obj.get(key).getAsString() : defaultValue;
+    }
+
+    // Getter
 
     public String getLongitude() { return longitude; }
     public String getLatitude() { return latitude; }

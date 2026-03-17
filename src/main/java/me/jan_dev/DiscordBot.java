@@ -2,67 +2,59 @@ package me.jan_dev;
 
 import commands.ISSData;
 import commands.NasaPictureOfTheDay;
+import data.Config;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-
-import data.Config;
-
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hauptklasse für den Discord-Bot.
- * Diese Klasse initialisiert und startet den Bot mit den notwendigen Listenern und Slash-Commands.
+ * Initialisiert und startet den Bot mit den notwendigen Listenern und Slash-Commands.
  */
-public class DiscordBot extends ListenerAdapter {
+public class DiscordBot {
 
-    /**
-     * Einstiegspunkt des Programms.
-     * Initialisiert den Bot, lädt die Konfiguration und registriert die Befehle.
-     *
-     * @param args Kommandozeilenargumente  (werden nicht genutzt)
-     * @throws InterruptedException Falls die Bot-Initialisierung unterbrochen wird
-     * @throws IOException Falls ein Fehler beim Laden der Konfigurationsdatei auftritt
-     */
+    private static final Logger log = LoggerFactory.getLogger(DiscordBot.class);
+
     public static void main(String[] args) throws InterruptedException {
 
-        // Bot-Token aus der Konfiguration abrufen
         String token = Config.get("botToken");
 
         if (token == null || token.isBlank()) {
             throw new RuntimeException("Bot-Token nicht in config.properties gefunden!");
         }
 
-        // Erstellen und Starten der JDA-Instanz mit den benötigten Berechtigungen
         JDA bot = JDABuilder.createDefault(token,
-                        GatewayIntent.GUILD_MESSAGES, // Erlaubt das Empfangen von Nachrichten in Servern
-                        GatewayIntent.MESSAGE_CONTENT) // Erlaubt das Lesen des Nachrichteninhalts
-                .setActivity(Activity.playing("mit der ISS")) // Status des Bots setzen
-                .addEventListeners(new BotListener()) // Registrieren des Bot-Listeners für Befehlsverarbeitung
-                .addEventListeners(new NasaPictureOfTheDay()) // Registrieren des NASA-Befehls
-                .addEventListeners(new ISSData()) // Registrieren des ISS-Daten-Befehls
+                        GatewayIntent.GUILD_MESSAGES,
+                        GatewayIntent.MESSAGE_CONTENT)
+                .setActivity(Activity.playing("mit der ISS"))
+                .addEventListeners(new BotListener())
+                .addEventListeners(new NasaPictureOfTheDay())
+                .addEventListeners(new ISSData())
                 .disableCache(
-                        CacheFlag.VOICE_STATE, // Deaktiviert den Voice-Status-Cache (nicht benötigt)
-                        CacheFlag.EMOJI, // Deaktiviert den Emoji-Cache
-                        CacheFlag.STICKER, // Deaktiviert den Sticker-Cache
-                        CacheFlag.SCHEDULED_EVENTS // Deaktiviert geplante Events (nicht benötigt)
+                        CacheFlag.VOICE_STATE,
+                        CacheFlag.EMOJI,
+                        CacheFlag.STICKER,
+                        CacheFlag.SCHEDULED_EVENTS
                 )
                 .build()
-                .awaitReady(); // Warten, bis der Bot vollständig verbunden ist
+                .awaitReady();
 
-        // Globale Slash-Commands registrieren
-        bot.updateCommands().addCommands(
-                Commands.slash("picture", "Zeigt das aktuelle 'Picture of the Day' von der NASA"),
-                Commands.slash("pictureinfo", "Gibt Infos über das 'Picture of the Day' von der NASA"),
-                Commands.slash("iss", "Gibt die aktuelle Position der ISS aus"),
-                Commands.slash("help", "Zeigt eine Hilfeliste an")
-        ).queue();
+        // Slash-Commands nur bei Bedarf registrieren:
+        // Entferne den Kommentar und starte den Bot einmal, um Commands zu registrieren.
+        // Danach wieder auskommentieren, um Rate-Limits zu vermeiden.
+        //
+        // bot.updateCommands().addCommands(
+        //         Commands.slash("picture", "Zeigt das aktuelle 'Picture of the Day' von der NASA"),
+        //         Commands.slash("pictureinfo", "Gibt Infos über das 'Picture of the Day' von der NASA"),
+        //         Commands.slash("iss", "Gibt die aktuelle Position der ISS aus"),
+        //         Commands.slash("help", "Zeigt eine Hilfeliste an")
+        // ).queue();
 
-        // Erfolgreiche Initialisierung im Konsolen-Output anzeigen
-        System.out.println("Bot ist bereit und läuft auf mehreren Servern!");
+        log.info("Bot ist bereit und läuft auf {} Server(n)!", bot.getGuilds().size());
     }
 }

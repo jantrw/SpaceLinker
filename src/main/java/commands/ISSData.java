@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Die Klasse {@code ISSData} verarbeitet den Discord-Slash-Befehl "/iss" und liefert aktuelle Informationen
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ISSData extends ListenerAdapter {
 
+    private static final Logger log = LoggerFactory.getLogger(ISSData.class);
     private static final int MAX_FIELD_VALUE = 1024;
     private final JSONFetcherIss jsonFetcher;
 
@@ -61,7 +64,7 @@ public class ISSData extends ListenerAdapter {
 
             } catch (Exception e) {
                 hook.sendMessage("❌ Fehler beim Abrufen der ISS-Daten.").queue();
-                e.printStackTrace();
+                log.error("Fehler beim Abrufen der ISS-Daten", e);
             }
         });
     }
