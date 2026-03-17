@@ -46,8 +46,8 @@ public class ISSData extends ListenerAdapter {
                         .setTitle("📡 Aktuelle ISS-Position 🌍")
                         .addField("🛰 Breitengrad", safeValue(jsonFetcher.getLatitude()), true)
                         .addField("🛰 Längengrad", safeValue(jsonFetcher.getLongitude()), true)
-                        .addField("🚀 Geschwindigkeit", String.format("%.3f km/h", jsonFetcher.getVelocity()), true)
-                        .addField("📏 Höhe", String.format("%.3f km", jsonFetcher.getAltitude()), true)
+                        .addField("🚀 Geschwindigkeit", formatVelocity(jsonFetcher.getVelocity()), true)
+                        .addField("📏 Höhe", formatAltitude(jsonFetcher.getAltitude()), true)
                         .addField("📌 Land/Ozean", safeValue(locationText), true)
                         .addField("⏰ Zeitzone", safeValue(jsonFetcher.getTimezone_id()), true);
 
@@ -56,6 +56,13 @@ public class ISSData extends ListenerAdapter {
                 }
 
                 String mapUrl = jsonFetcher.getMapUrl();
+                if (mapUrl == null || mapUrl.isEmpty()) {
+                    String lat = jsonFetcher.getLatitude();
+                    String lon = jsonFetcher.getLongitude();
+                    if (lat != null && lon != null) {
+                        mapUrl = "https://www.openstreetmap.org/?mlat=" + lat + "&mlon=" + lon + "#map=5/" + lat + "/" + lon;
+                    }
+                }
                 if (mapUrl != null && !mapUrl.isEmpty()) {
                     embed.addField("🌍 Live-Karte", "[Ansehen](" + mapUrl + ")", false);
                 }
@@ -83,6 +90,14 @@ public class ISSData extends ListenerAdapter {
 
     private String safeValue(String value) {
         return (value == null || value.isEmpty()) ? "??" : value;
+    }
+
+    private String formatVelocity(double velocity) {
+        return velocity <= 0 ? "nicht verfügbar" : String.format("%.3f km/h", velocity);
+    }
+
+    private String formatAltitude(double altitude) {
+        return altitude <= 0 ? "nicht verfügbar" : String.format("%.3f km", altitude);
     }
 
     private String truncate(String text, int maxLength) {

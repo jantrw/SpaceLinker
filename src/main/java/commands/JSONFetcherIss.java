@@ -21,7 +21,7 @@ public class JSONFetcherIss {
 
     private static final String NORAD_ID = "25544";
     private static final String DEFAULT_VALUE = "??";
-    private static final Duration TIMEOUT = Duration.ofSeconds(8);
+    private static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     private String longitude, latitude, timezone_id, country, city, state, mapUrl, ocean;
     private double velocity, altitude;

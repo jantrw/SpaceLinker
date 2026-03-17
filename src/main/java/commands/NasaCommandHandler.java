@@ -21,7 +21,7 @@ public class NasaCommandHandler {
 
     private static final int MAX_EMBED_TITLE = 256;
     private static final int MAX_EMBED_DESCRIPTION = 4096;
-    private static final Duration TIMEOUT = Duration.ofSeconds(8);
+    private static final Duration TIMEOUT = Duration.ofSeconds(20);
 
     private final String apiKey;
 
