@@ -25,6 +25,9 @@ public class NasaCommandHandler {
 
     private final String apiKey;
 
+    /**
+     * Initialisiert den Handler mit dem konfigurierten NASA-API-Key.
+     */
     public NasaCommandHandler() {
         this.apiKey = data.Config.get("apiKeyNasa", "DEMO_KEY");
     }
@@ -76,6 +79,11 @@ public class NasaCommandHandler {
         return embed;
     }
 
+    /**
+     * Lädt die APOD-Antwort der NASA und wandelt sie in ein {@link JsonObject} um.
+     *
+     * @return APOD-Daten oder {@code null} bei Fehlern
+     */
     private JsonObject fetchApodData() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -93,14 +101,35 @@ public class NasaCommandHandler {
         }
     }
 
+    /**
+     * Liest einen String-Wert aus dem JSON oder liefert einen Fallback zurück.
+     *
+     * @param obj JSON-Objekt
+     * @param key Schlüssel im JSON
+     * @param defaultValue Fallback-Wert
+     * @return JSON-Wert oder Fallback
+     */
     private String getString(JsonObject obj, String key, String defaultValue) {
         return obj.has(key) ? obj.get(key).getAsString() : defaultValue;
     }
 
+    /**
+     * Prüft, ob die NASA-Antwort ein Bild und kein Video oder anderes Medium beschreibt.
+     *
+     * @param obj APOD-Antwort als JSON
+     * @return {@code true}, wenn {@code media_type=image}
+     */
     static boolean isImage(JsonObject obj) {
         return "image".equalsIgnoreCase(obj.has("media_type") ? obj.get("media_type").getAsString() : "image");
     }
 
+    /**
+     * Kürzt einen Text auf die maximal erlaubte Embed-Länge.
+     *
+     * @param text Eingabetext
+     * @param maxLength erlaubte Maximallänge
+     * @return ggf. gekürzter Text
+     */
     private String truncate(String text, int maxLength) {
         if (text == null) return "";
         if (text.length() <= maxLength) return text;

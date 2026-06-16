@@ -27,10 +27,18 @@ public class JSONFetcherIss {
     private double velocity, altitude;
     private final String username;
 
+    /**
+     * Initialisiert den ISS-Fetcher mit dem konfigurierten GeoNames-Benutzernamen.
+     */
     public JSONFetcherIss() {
         this.username = Config.get("username", "");
     }
 
+    /**
+     * Lädt alle ISS-Daten in der benötigten Reihenfolge.
+     *
+     * @return {@code true}, wenn mindestens die ISS-Koordinaten erfolgreich geladen wurden
+     */
     public boolean fetchAllData() {
         fetchLocation();
 
@@ -46,6 +54,9 @@ public class JSONFetcherIss {
         return true;
     }
 
+    /**
+     * Lädt die aktuelle ISS-Position.
+     */
     public void fetchLocation() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -68,6 +79,9 @@ public class JSONFetcherIss {
         }
     }
 
+    /**
+     * Lädt Geschwindigkeit und Höhe der ISS.
+     */
     public void fetchSpeedHeight() {
         if (latitude == null || longitude == null) return;
 
@@ -91,6 +105,9 @@ public class JSONFetcherIss {
         }
     }
 
+    /**
+     * Lädt Zeitzone und Kartenlink für die aktuelle ISS-Position.
+     */
     public void fetchMapUrlTimeZone() {
         if (latitude == null || longitude == null) return;
 
@@ -114,6 +131,9 @@ public class JSONFetcherIss {
         }
     }
 
+    /**
+     * Ermittelt den Ozean unter der ISS, falls verfügbar.
+     */
     public void fetchOcean() {
         if (latitude == null || longitude == null) return;
         if (username == null || username.isBlank()) {
@@ -143,6 +163,9 @@ public class JSONFetcherIss {
         }
     }
 
+    /**
+     * Ermittelt Land, Bundesland und Stadt für die aktuelle ISS-Position.
+     */
     public void fetchCountry() {
         if (latitude == null || longitude == null) return;
 
@@ -185,16 +208,73 @@ public class JSONFetcherIss {
         return (obj.has(key) && !obj.get(key).isJsonNull()) ? obj.get(key).getAsString() : defaultValue;
     }
 
-    // Getter
-
+    /**
+     * Gibt den zuletzt geladenen Längengrad der ISS zurück.
+     *
+     * @return Längengrad
+     */
     public String getLongitude() { return longitude; }
+
+    /**
+     * Gibt den zuletzt geladenen Breitengrad der ISS zurück.
+     *
+     * @return Breitengrad
+     */
     public String getLatitude() { return latitude; }
+
+    /**
+     * Gibt die zuletzt geladene Zeitzone der ISS-Position zurück.
+     *
+     * @return Zeitzonen-ID
+     */
     public String getTimezone_id() { return timezone_id; }
+
+    /**
+     * Gibt das zuletzt geladene Land unter der ISS zurück.
+     *
+     * @return Ländername oder Fallback
+     */
     public String getCountry() { return country; }
+
+    /**
+     * Gibt den Kartenlink zur zuletzt geladenen ISS-Position zurück.
+     *
+     * @return Karten-URL
+     */
     public String getMapUrl() { return mapUrl; }
+
+    /**
+     * Gibt die zuletzt geladene ISS-Geschwindigkeit zurück.
+     *
+     * @return Geschwindigkeit in km/h
+     */
     public double getVelocity() { return velocity; }
+
+    /**
+     * Gibt die zuletzt geladene ISS-Höhe zurück.
+     *
+     * @return Höhe in km
+     */
     public double getAltitude() { return altitude; }
+
+    /**
+     * Gibt den zuletzt geladenen Ozean unter der ISS zurück.
+     *
+     * @return Ozeanname oder Fallback
+     */
     public String getOcean() { return ocean; }
+
+    /**
+     * Gibt das zuletzt geladene Bundesland oder den Staat unter der ISS zurück.
+     *
+     * @return Staat oder Fallback
+     */
     public String getState() { return state; }
+
+    /**
+     * Gibt die zuletzt geladene Stadt unter der ISS zurück.
+     *
+     * @return Stadtname oder Fallback
+     */
     public String getCity() { return city; }
 }

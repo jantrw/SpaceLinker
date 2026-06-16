@@ -9,6 +9,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BotListener extends ListenerAdapter {
 
+    /**
+     * Beantwortet den Slash-Command {@code /help} mit einer kompakten Befehlsübersicht.
+     *
+     * @param event Slash-Command-Interaktion des Nutzers
+     */
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("help")) return;

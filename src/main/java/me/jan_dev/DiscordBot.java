@@ -33,6 +33,12 @@ public class DiscordBot {
             Commands.slash("help", "Zeigt eine Hilfeliste an")
     );
 
+    /**
+     * Startet den Discord-Bot und registriert bei Bedarf die Slash-Commands.
+     *
+     * @param args ungenutzte Startargumente
+     * @throws InterruptedException falls das Warten auf JDA unterbrochen wird
+     */
     public static void main(String[] args) throws InterruptedException {
 
         String token = Config.get("botToken");
@@ -61,6 +67,11 @@ public class DiscordBot {
         log.info("Bot ist bereit und läuft auf {} Server(n)!", bot.getGuilds().size());
     }
 
+    /**
+     * Registriert Slash-Commands nur dann neu, wenn sie vom erwarteten Satz abweichen.
+     *
+     * @param bot aktive JDA-Instanz
+     */
     private static void registerCommandsIfNeeded(JDA bot) {
         Set<String> expectedNames = EXPECTED_COMMANDS.stream()
                 .map(CommandData::getName)

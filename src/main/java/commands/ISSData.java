@@ -17,10 +17,18 @@ public class ISSData extends ListenerAdapter {
     private static final int MAX_FIELD_VALUE = 1024;
     private final JSONFetcherIss jsonFetcher;
 
+    /**
+     * Initialisiert den Handler für den Slash-Command {@code /iss}.
+     */
     public ISSData() {
         this.jsonFetcher = new JSONFetcherIss();
     }
 
+    /**
+     * Verarbeitet den Slash-Command {@code /iss} und antwortet mit einem Embed der aktuellen ISS-Daten.
+     *
+     * @param event Slash-Command-Interaktion des Nutzers
+     */
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equals("iss")) return;
@@ -76,6 +84,13 @@ public class ISSData extends ListenerAdapter {
         });
     }
 
+    /**
+     * Baut den optionalen Detailtext für Staat und Stadt.
+     *
+     * @param state Name des Staats oder Bundeslands
+     * @param city Name der Stadt
+     * @return formatierter Detailtext oder leerer String
+     */
     private String getCityStateText(String state, String city) {
         StringBuilder sb = new StringBuilder();
         if (state != null && !state.equals("??")) {
@@ -88,18 +103,43 @@ public class ISSData extends ListenerAdapter {
         return sb.toString();
     }
 
+    /**
+     * Liefert einen Anzeige-Fallback für leere Werte.
+     *
+     * @param value zu prüfender Wert
+     * @return Originalwert oder {@code ??}
+     */
     private String safeValue(String value) {
         return (value == null || value.isEmpty()) ? "??" : value;
     }
 
+    /**
+     * Formatiert die ISS-Geschwindigkeit für das Discord-Embed.
+     *
+     * @param velocity Geschwindigkeit in km/h
+     * @return formatierter Anzeigetext
+     */
     private String formatVelocity(double velocity) {
         return velocity <= 0 ? "nicht verfügbar" : String.format("%.3f km/h", velocity);
     }
 
+    /**
+     * Formatiert die ISS-Höhe für das Discord-Embed.
+     *
+     * @param altitude Höhe in km
+     * @return formatierter Anzeigetext
+     */
     private String formatAltitude(double altitude) {
         return altitude <= 0 ? "nicht verfügbar" : String.format("%.3f km", altitude);
     }
 
+    /**
+     * Kürzt einen Text auf die maximal erlaubte Länge für Discord-Felder.
+     *
+     * @param text Eingabetext
+     * @param maxLength erlaubte Maximallänge
+     * @return ggf. gekürzter Text
+     */
     private String truncate(String text, int maxLength) {
         if (text == null) return "";
         if (text.length() <= maxLength) return text;

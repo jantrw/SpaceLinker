@@ -25,6 +25,11 @@ public class Config {
         properties.putAll(loadFileProperties());
     }
 
+    /**
+     * Lädt eine lokale {@code config.properties} aus den unterstützten Kandidatenpfaden.
+     *
+     * @return geladene Properties, ggf. leer
+     */
     static Properties loadFileProperties() {
         Properties loaded = new Properties();
 
@@ -46,6 +51,11 @@ public class Config {
         return loaded;
     }
 
+    /**
+     * Liefert die möglichen Pfade für die lokale Konfigurationsdatei.
+     *
+     * @return Liste unterstützter Dateipfade
+     */
     private static List<Path> configCandidates() {
         String configuredPath = System.getProperty("spacelinker.config.path", "").trim();
         if (!configuredPath.isEmpty()) {
@@ -86,6 +96,14 @@ public class Config {
         return resolveValue(properties, System.getenv(), key).isPresent();
     }
 
+    /**
+     * Liest einen Wert bevorzugt aus Umgebungsvariablen und sonst aus Properties.
+     *
+     * @param properties geladene Properties
+     * @param environment aktuelle Umgebungsvariablen
+     * @param key Konfigurationsschlüssel
+     * @return aufgelöster Wert, falls vorhanden
+     */
     static Optional<String> resolveValue(Properties properties, Map<String, String> environment, String key) {
         String envKey = toEnvironmentKey(key);
         Optional<String> envValue = normalize(environment.get(envKey));
@@ -96,6 +114,12 @@ public class Config {
         return normalize(properties.getProperty(key));
     }
 
+    /**
+     * Mappt einen internen Konfigurationsschlüssel auf die zugehörige Umgebungsvariable.
+     *
+     * @param key Konfigurationsschlüssel
+     * @return Name der Umgebungsvariable
+     */
     private static String toEnvironmentKey(String key) {
         return switch (key) {
             case "botToken" -> "DISCORD_TOKEN";
@@ -105,6 +129,12 @@ public class Config {
         };
     }
 
+    /**
+     * Entfernt Leerzeichen und behandelt leere Werte als nicht vorhanden.
+     *
+     * @param value Eingabewert
+     * @return normalisierter Wert oder leer
+     */
     private static Optional<String> normalize(String value) {
         if (value == null) {
             return Optional.empty();

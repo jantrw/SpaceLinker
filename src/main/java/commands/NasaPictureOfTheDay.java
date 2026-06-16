@@ -16,6 +16,11 @@ public class NasaPictureOfTheDay extends ListenerAdapter {
 
     private final NasaCommandHandler handler = new NasaCommandHandler();
 
+    /**
+     * Verarbeitet die Slash-Commands {@code /picture} und {@code /pictureinfo}.
+     *
+     * @param event Slash-Command-Interaktion des Nutzers
+     */
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         String name = event.getName();
