@@ -1,13 +1,13 @@
 # SpaceLinker
 
-Ein Discord-Bot, der Menschen mit dem Weltraum verbindet – mit Echtzeit-ISS-Tracking und dem Astronomy Picture of the Day von der NASA.
+Ein Discord-Bot, der Menschen mit dem Weltraum verbindet - mit Echtzeit-ISS-Tracking und dem Astronomy Picture of the Day von der NASA.
 
 ## Funktionen
 
-- **ISS-Tracking** — Echtzeit-Position, Geschwindigkeit, Höhe, Land, Stadt, Zeitzone und Kartenlink
-- **NASA Bild des Tages** — Tägliches Astronomiebild mit Titel
-- **NASA Bild des Tages + Info** — Tägliches Astronomiebild mit vollständiger Beschreibung
-- **Slash-Commands** — Moderne Discord-Slash-Befehle
+- **ISS-Tracking** - Echtzeit-Position, Geschwindigkeit, Höhe, Land, Stadt, Zeitzone und Kartenlink
+- **NASA Bild des Tages** - Tägliches Astronomiebild mit Titel
+- **NASA Bild des Tages + Info** - Tägliches Astronomiebild mit vollständiger Beschreibung
+- **Slash-Commands** - Moderne Discord-Slash-Befehle
 
 ### Screenshots
 
@@ -19,9 +19,9 @@ Ein Discord-Bot, der Menschen mit dem Weltraum verbindet – mit Echtzeit-ISS-Tr
 
 - **Java 21+**
 - **Maven 3.8+**
-- **Discord-Bot-Token** — [Discord Developer Portal](https://discord.com/developers/applications)
-- **NASA-API-Key** — [api.nasa.gov](https://api.nasa.gov/) (kostenlos, oder `DEMO_KEY` für eingeschränkten Zugriff)
-- **GeoNames-Benutzername** — [geonames.org](https://www.geonames.org/) (kostenloses Konto, für Ozean-Erkennung)
+- **Discord-Bot-Token** - [Discord Developer Portal](https://discord.com/developers/applications)
+- **NASA-API-Key** - [api.nasa.gov](https://api.nasa.gov/) (kostenlos, oder `DEMO_KEY` für eingeschränkten Zugriff)
+- **GeoNames-Benutzername** - [geonames.org](https://www.geonames.org/) (kostenloses Konto, für Ozean-Erkennung)
 
 ## Einrichtung
 
@@ -52,13 +52,13 @@ cp config.properties.example config.properties
 `config.properties` bearbeiten:
 
 ```properties
-# NASA API-Key — kostenlos unter https://api.nasa.gov/
+# NASA API-Key - kostenlos unter https://api.nasa.gov/
 apiKeyNasa=DEIN_NASA_API_KEY
 
-# Discord-Bot-Token — unter https://discord.com/developers/applications
+# Discord-Bot-Token - unter https://discord.com/developers/applications
 botToken=DEIN_DISCORD_BOT_TOKEN
 
-# GeoNames-Benutzername — Registrierung unter https://www.geonames.org/
+# GeoNames-Benutzername - Registrierung unter https://www.geonames.org/
 username=DEIN_GEONAMES_BENUTZERNAME
 ```
 
@@ -115,7 +115,7 @@ src/main/java/
 │   ├── DiscordBot.java          # Einstiegspunkt, Bot-Setup, Command-Registrierung
 │   └── BotListener.java         # /help Slash-Command-Handler
 ├── commands/
-│   ├── ISSData.java             # /iss Befehl — baut das ISS-Embed
+│   ├── ISSData.java             # /iss Befehl - baut das ISS-Embed
 │   ├── JSONFetcherIss.java      # Holt ISS-Daten von mehreren APIs
 │   ├── NasaPictureOfTheDay.java # /picture und /pictureinfo Befehle
 │   └── NasaCommandHandler.java  # Holt NASA APOD-Daten
@@ -136,9 +136,9 @@ src/main/java/
 
 ## Tech-Stack
 
-- **[JDA 5.2.2](https://github.com/DV8FromTheWorld/JDA)** — Java Discord API
-- **[Gson 2.10.1](https://github.com/google/gson)** — JSON-Verarbeitung
-- **[SLF4J](https://www.slf4j.org/) + slf4j-simple** — Logging
+- **[JDA 5.2.2](https://github.com/DV8FromTheWorld/JDA)** - Java Discord API
+- **[Gson 2.10.1](https://github.com/google/gson)** - JSON-Verarbeitung
+- **[SLF4J](https://www.slf4j.org/) + slf4j-simple** - Logging
 
 ## Build & CI
 
