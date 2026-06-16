@@ -40,9 +40,16 @@ public class NasaCommandHandler {
                     .setDescription("NASA-Daten konnten nicht geladen werden.");
         }
 
-        return new EmbedBuilder()
-                .setTitle(truncate(getString(data, "title", "Kein Titel verfügbar"), MAX_EMBED_TITLE))
-                .setImage(getString(data, "url", ""));
+        EmbedBuilder embed = new EmbedBuilder()
+                .setTitle(truncate(getString(data, "title", "Kein Titel verfügbar"), MAX_EMBED_TITLE));
+
+        if (isImage(data)) {
+            embed.setImage(getString(data, "url", ""));
+        } else {
+            embed.setDescription(truncate("NASA APOD ist heute kein Bild.\n" + getString(data, "url", ""), MAX_EMBED_DESCRIPTION));
+        }
+
+        return embed;
     }
 
     /**
@@ -56,10 +63,17 @@ public class NasaCommandHandler {
                     .setDescription("NASA-Daten konnten nicht geladen werden.");
         }
 
-        return new EmbedBuilder()
+        EmbedBuilder embed = new EmbedBuilder()
                 .setTitle(truncate(getString(data, "title", "Kein Titel verfügbar"), MAX_EMBED_TITLE))
-                .setDescription(truncate(getString(data, "explanation", "Keine Erklärung verfügbar"), MAX_EMBED_DESCRIPTION))
-                .setImage(getString(data, "url", ""));
+                .setDescription(truncate(getString(data, "explanation", "Keine Erklärung verfügbar"), MAX_EMBED_DESCRIPTION));
+
+        if (isImage(data)) {
+            embed.setImage(getString(data, "url", ""));
+        } else {
+            embed.appendDescription("\n\n" + truncate("NASA APOD ist heute kein Bild.\n" + getString(data, "url", ""), MAX_EMBED_DESCRIPTION / 2));
+        }
+
+        return embed;
     }
 
     private JsonObject fetchApodData() {
@@ -81,6 +95,10 @@ public class NasaCommandHandler {
 
     private String getString(JsonObject obj, String key, String defaultValue) {
         return obj.has(key) ? obj.get(key).getAsString() : defaultValue;
+    }
+
+    static boolean isImage(JsonObject obj) {
+        return "image".equalsIgnoreCase(obj.has("media_type") ? obj.get("media_type").getAsString() : "image");
     }
 
     private String truncate(String text, int maxLength) {

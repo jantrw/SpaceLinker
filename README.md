@@ -32,15 +32,24 @@ git clone https://github.com/jantrw/SpaceLinker.git
 cd SpaceLinker
 ```
 
-### 2. Konfigurationsdatei erstellen
+### 2. Konfiguration bereitstellen
 
-Die Beispielkonfiguration kopieren und API-Schlüssel eintragen:
+Option A: Umgebungsvariablen setzen:
 
-```sh
-cp src/main/resources/config.properties.example src/main/resources/config.properties
+```env
+DISCORD_TOKEN=DEIN_DISCORD_BOT_TOKEN
+NASA_API_KEY=DEIN_NASA_API_KEY
+GEONAMES_USERNAME=DEIN_GEONAMES_BENUTZERNAME
 ```
 
-`src/main/resources/config.properties` bearbeiten:
+Option B: lokale `config.properties` in der Projektwurzel anlegen.
+Die Vorlage ist `config.properties.example`.
+
+```sh
+cp config.properties.example config.properties
+```
+
+`config.properties` bearbeiten:
 
 ```properties
 # NASA API-Key — kostenlos unter https://api.nasa.gov/
@@ -53,7 +62,7 @@ botToken=DEIN_DISCORD_BOT_TOKEN
 username=DEIN_GEONAMES_BENUTZERNAME
 ```
 
-> **Hinweis:** `config.properties` steht in `.gitignore` und wird nicht committed.
+> **Hinweis:** `config.properties` ist nur lokal, steht in `.gitignore`, wird nicht committed und nicht ins Jar gepackt.
 
 ### 3. Discord-Bot erstellen
 
@@ -111,7 +120,7 @@ src/main/java/
 │   ├── NasaPictureOfTheDay.java # /picture und /pictureinfo Befehle
 │   └── NasaCommandHandler.java  # Holt NASA APOD-Daten
 └── data/
-    ├── Config.java              # Lädt config.properties aus dem Classpath
+    ├── Config.java              # Lädt config.properties extern oder aus Umgebungsvariablen
     └── Http.java                # Gemeinsame HttpClient-Instanz
 ```
 
@@ -130,6 +139,12 @@ src/main/java/
 - **[JDA 5.2.2](https://github.com/DV8FromTheWorld/JDA)** — Java Discord API
 - **[Gson 2.10.1](https://github.com/google/gson)** — JSON-Verarbeitung
 - **[SLF4J](https://www.slf4j.org/) + slf4j-simple** — Logging
+
+## Build & CI
+
+- GitHub Actions baut das Projekt mit Java 21 und `mvn -B verify`
+- Das Build erzeugt per Maven Shade Plugin ein ausführbares Jar
+- Secrets bleiben außerhalb des Source-Trees
 
 ## Lizenz
 

@@ -13,4 +13,5 @@ Thumbs.db
 .DS_Store
 
 # Config (contains secrets)
+config.properties
 src/main/resources/config.properties
